@@ -1,8 +1,11 @@
+// Ignacio Diaz Diaz
+
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 
-const char *contador = "contador.txt";
+const char *contador = "aux_contador.txt";
+const char *contador_save = "contador.txt";
 
 typedef struct {
 	int DNI;
@@ -21,8 +24,11 @@ int main() {
 	// Variables
 
 	int opcion;
-	int cantCuentas = cargar_contador(contador);
+	int cantCuentas = cargar_contador(contador_save);
 	bool terminado = false;
+	bool terminado1 = false;
+	FILE *file;
+	FILE *archivo;
 
 	// Struct
 	Personas personas;
@@ -49,9 +55,57 @@ int main() {
 
 			break;
 
-		case 3:
+		case 4:
 			terminado = true;
-			printf("Sistema cerrado.");
+			
+			do{
+			
+			printf("Desea guardar los datos registrados?\n1. Si\n2. No.\nOpcion: ");
+			scanf("%d",&opcion);
+			
+			switch(opcion){
+				case 1:
+					
+					// Personas
+					
+					file = fopen("personas.txt", "rb");
+					archivo = fopen("personas_guardado.txt", "ab");
+					
+					while (fread(&personas, sizeof(personas), 1, file) == 1) {
+						
+						fwrite(&personas, sizeof(personas), 1, archivo);
+						
+					}
+					
+					fclose(file);
+					fclose(archivo);
+					
+					// Contadores
+					
+					
+					file = fopen(contador, "r");
+					archivo = fopen(contador_save, "w");
+					
+					fscanf(file, "%d", &cantCuentas);
+					fprintf(file, "%d", cantCuentas);
+					
+					fclose(file);
+					fclose(archivo);
+					
+					terminado1 = true;
+					break;
+					
+				case 2:
+					terminado1 = true;
+					break;
+					
+				default:
+					printf("Esa no es una opcion posible.");
+			}
+			
+			}while(terminado1 == false);
+			
+			printf("\n\nSistema cerrado.");
 			break;
 
 		default:
@@ -117,11 +171,14 @@ void ingresoDatos(Personas personas, int *contador) {
 }
 
 void busquedaDatos(Personas personas, int cantCuentas) {
-
+	
+	int cant = 0;
 	int opcion;
 	int DNI;
 	bool terminado = false;
 	FILE *file;
+	
+	bool encontrado = false;
 
 	int subopcion;
 	bool subterminado = false;
@@ -137,7 +194,7 @@ void busquedaDatos(Personas personas, int cantCuentas) {
 
 		case 1:
 			
-			int cant = 0;
+			
 
 			file = fopen("personas.txt", "rb");
 			while(fread(&personas, sizeof(personas), 1, file) == 1) {
@@ -236,7 +293,7 @@ void busquedaDatos(Personas personas, int cantCuentas) {
 
 			file = fopen("personas.txt", "rb");
 
-			bool encontrado = false;
+			
 			while (fread(&personas, sizeof(personas), 1, file) == 1) {
 				if(DNI == personas.DNI) {
 
